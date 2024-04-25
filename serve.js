@@ -19,6 +19,7 @@ app.use('/sw.js', express.static('sw.js'))
 app.use('/js', express.static('js'))
 app.use('/css', express.static('css'))
 app.use('/icons', express.static('icons'))
+app.use('/public', express.static('public'))
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 

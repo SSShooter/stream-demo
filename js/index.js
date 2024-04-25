@@ -46,10 +46,19 @@ class DomWriter extends WritableStream {
     })
   }
 }
+
+let ac = null
 const getNovelStream = async () => {
+  if (ac) {
+    ac.abort('refetch')
+  }
   resultsContainer.innerHTML = ''
   const start = performance.now()
-  const response = await fetch(`/novel`)
+  // prevent wrong callback
+  ac = new AbortController()
+  const signal = ac.signal
+  // signal = null
+  const response = await fetch(`/novel`, { signal })
 
   let firstResponse = performance.now()
   console.log(`Done! 🔥 Took ${firstResponse - start}ms`)
@@ -61,6 +70,7 @@ const getNovelStream = async () => {
   console.log(
     `Streaming done! 🔥 ${performance.now() - firstResponse}ms after request.`
   )
+  ac = null
 }
 
 const getNovelStreamOld = () => {
@@ -111,7 +121,6 @@ const getNovel = async () => {
 searchButton.addEventListener('click', () => getNovelStream())
 fetchAllButton.addEventListener('click', () => getNovel())
 
-// Set up our serviceWorker for offline things and faster streaming.
 // if ("serviceWorker" in navigator) {
 //   navigator.serviceWorker
 //     .register("../sw.js")

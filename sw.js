@@ -30,47 +30,13 @@ const responseFromCacheOrFetchAndCache = (request) =>
     .match(request)
     .then((cachedItem) => cachedItem || fetchAndCache(request))
 
-// Here's what makes our app nice and fast
-const makeBookStream = (request) => {
-  // Let's create a stream.
-  const stream = new ReadableStream({
-    // On start,
-    start(controller) {
-      // This function processes a ReadableStream (from Response.body)
-      const processStream = (body) => {
-        // no Response.body stream available
-        if (!body) return controller.close()
-
-        // Get the reader.
-        const reader = body.getReader()
-
-        /*
-          This function is called everytime the reader reads.
-          It enqueues a chunk and then calls itself.
-          This is a concept called recursion. Also, it's fun. :D
-        */
-        const processChunk = (chunk) => {
-          if (chunk.done) return controller.close()
-          controller.enqueue(chunk.value)
-          return reader.read().then(processChunk)
-        }
-        reader.read().then(processChunk)
-      }
-
-      // This kicks things off!
-      responseFromCacheOrFetchAndCache(request).then((response) =>
-        processStream(response.body)
-      )
-    },
-  })
-
-  return stream
-}
-
 // On install, cache all the things!
 this.addEventListener('install', (event) =>
   event.waitUntil(
-    caches.open(activeCache).then((cache) => cache.addAll(thingsToCache))
+    caches.open(activeCache).then((cache) => {
+      caches.delete(activeCache)
+      cache.addAll(thingsToCache)
+    })
   )
 )
 
@@ -85,26 +51,22 @@ self.addEventListener('activate', function (event) {
             return true
           })
           .map(function (cacheName) {
-            return caches.delete(cacheName);
-          }),
-      );
-    }),
-  );
-});
+            return caches.delete(cacheName)
+          })
+      )
+    })
+  )
+})
 
-
-// On fetch,
 this.addEventListener('fetch', async (event) => {
-  console.log('on fetch', this)
   const { request } = event
+  console.log('on fetch', request.url)
 
   // If we're looking for books,
-  if (request.url.indexOf('/books/') > -1) {
-    const headers = new Headers({ 'Content-Type': 'text/html' })
-    const response = new Response(makeBookStream(request), headers)
-
+  if (request.url.indexOf('/novel') > -1) {
+    const resp = await responseFromCacheOrFetchAndCache(request)
     // Respond with a HTML stream
-    return event.respondWith(response)
+    return event.respondWith(resp.body)
   }
 
   // If we're looking for something else (css/js/etc.), get it from the cache, or fetch it.
