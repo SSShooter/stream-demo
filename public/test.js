@@ -35,27 +35,43 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 var _this = this;
+var readableDiv = document.querySelector('#readable');
+var transformDiv = document.querySelector('#transform');
+var writableDiv = document.querySelector('#writable');
 // generate random characters with random length
 function randomChars() {
     return Array.from({ length: Math.floor(Math.random() * 20) })
         .map(function () { return String.fromCharCode(Math.floor(Math.random() * 26) + 97); })
-        .join("");
+        .join('');
 }
 function sleep(ms) {
     return new Promise(function (resolve) { return setTimeout(resolve, ms); });
 }
-var button = document.querySelector("#readable-steam-enqueue");
+function wrap(text) {
+    var p = document.createElement('p');
+    p.textContent = text;
+    return p;
+}
+function logInDiv(div, text) {
+    div.append(wrap(text));
+    div.scrollTop = div.scrollHeight;
+}
+var button = document.querySelector('#readable-steam-enqueue');
 var rQueuingStrategy = new CountQueuingStrategy({ highWaterMark: 5 });
+// const rQueuingStrategy = new ByteLengthQueuingStrategy({ highWaterMark: 1024 });
+var index = 0;
 var readableStream = new ReadableStream({
     start: function (controller) {
         button.onclick = function () {
-            console.log("enqueue", controller.desiredSize);
-            controller.enqueue(randomChars());
+            var log = index++ + ' start: ' + randomChars() + controller.desiredSize;
+            logInDiv(readableDiv, log);
+            controller.enqueue(log);
         };
     },
     pull: function (controller) {
-        console.log("pull", controller.desiredSize);
-        controller.enqueue("from pull: " + randomChars());
+        var log = index++ + ' pull: ' + randomChars() + controller.desiredSize;
+        logInDiv(readableDiv, log);
+        controller.enqueue(log);
     }
 }, rQueuingStrategy);
 // const reader = readableStream.getReader();
@@ -64,43 +80,52 @@ var readableStream = new ReadableStream({
 //     const { value, done } = await reader.read();
 //     console.log('read', value, done);
 // };
-var wQueuingStrategy = new CountQueuingStrategy({ highWaterMark: 1 });
+var wQueuingStrategy = new CountQueuingStrategy({ highWaterMark: 10 });
+// const wQueuingStrategy = new ByteLengthQueuingStrategy({ highWaterMark: 1024 });
 var writableStream = new WritableStream({
     write: function (chunk) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
-                        console.log("write start");
-                        return [4 /*yield*/, sleep(5000)];
+                    case 0: return [4 /*yield*/, sleep(5000)];
                     case 1:
                         _a.sent();
-                        console.log("write", chunk);
+                        logInDiv(writableDiv, chunk);
                         return [2 /*return*/];
                 }
             });
         });
     }
-}, wQueuingStrategy);
+}, wQueuingStrategy
+// {
+//   highWaterMark: 1024,
+//   size(chunk) {
+//     return chunk.length
+//   },
+// }
+);
 // const writer = writableStream.getWriter();
 // writer.desiredSize
 var transformStream = new TransformStream({
     transform: function (chunk, controller) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                console.log("transform", chunk);
+                logInDiv(transformDiv, chunk);
                 controller.enqueue(chunk);
                 return [2 /*return*/];
             });
         });
     }
-});
+}
+// rQueuingStrategy,
+// wQueuingStrategy
+);
 readableStream.pipeThrough(transformStream).pipeTo(writableStream);
 var f = function () { return __awaiter(_this, void 0, void 0, function () {
     var response, clone, reader;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, fetch("/text")];
+            case 0: return [4 /*yield*/, fetch('/text')];
             case 1:
                 response = _a.sent();
                 clone = response.clone();

@@ -5,11 +5,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>stream test</title>
+    <style>
+        .wrapper {
+            margin-top: 20px;
+            display: flex;
+        }
+
+        #readable,
+        #transform,
+        #writable {
+            height: 80vh;
+            overflow: auto;
+            flex-basis: 30vw;
+        }
+    </style>
 </head>
 
 <body>
     <button id="readable-steam-enqueue">enqueue</button>
-    <button id="read">read</button>
+    <!-- <button id="read">read</button> -->
+    <div class="wrapper">
+        <div id="readable"></div>
+        <div id="transform"></div>
+        <div id="writable"></div>
+    </div>
     <script src="./test.js">
     </script>
 </body>

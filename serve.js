@@ -78,18 +78,20 @@ app.get('/novel-1', async (req, res) => {
 
 app.get('/novel', async (req, res) => {
   // get file
-  const file = fs.createReadStream('les-miserable.txt', { highWaterMark: 1024 })
+  const file = fs.createReadStream('les-miserable.txt', { highWaterMark: 1024 * 25 })
   // set header
   res.set('Content-Type', 'message')
   const encryptStream = new Transform({
     transform(chunk, encoding, callback) {
-      const encrypted = []
-      chunk.forEach((byte) => {
-        encrypted.push(map[byte])
-      })
-      const encryptedBuffer = Buffer.from(encrypted)
-      this.push(encryptedBuffer)
-      callback()
+      setTimeout(() => {
+        const encrypted = []
+        chunk.forEach((byte) => {
+          encrypted.push(map[byte])
+        })
+        const encryptedBuffer = Buffer.from(encrypted)
+        this.push(encryptedBuffer)
+        callback()
+      }, 10)
     },
   })
   file.pipe(encryptStream).pipe(res)
