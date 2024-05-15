@@ -101,6 +101,9 @@ const getNovelStreamOld = () => {
 }
 
 const getNovel = async () => {
+  if (ac) {
+    ac.abort('fetch all')
+  }
   resultsContainer.innerHTML = ''
 
   let firstResponse = performance.now()
