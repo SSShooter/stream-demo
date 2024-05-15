@@ -74,12 +74,6 @@ var readableStream = new ReadableStream({
         controller.enqueue(log);
     }
 }, rQueuingStrategy);
-// const reader = readableStream.getReader();
-// const readButton = document.querySelector('#read');
-// readButton.onclick = async () => {
-//     const { value, done } = await reader.read();
-//     console.log('read', value, done);
-// };
 var wQueuingStrategy = new CountQueuingStrategy({ highWaterMark: 10 });
 // const wQueuingStrategy = new ByteLengthQueuingStrategy({ highWaterMark: 1024 });
 var writableStream = new WritableStream({
@@ -96,16 +90,14 @@ var writableStream = new WritableStream({
             });
         });
     }
-}, wQueuingStrategy
-// {
-//   highWaterMark: 1024,
-//   size(chunk) {
-//     return chunk.length
-//   },
-// }
-);
-// const writer = writableStream.getWriter();
-// writer.desiredSize
+}, 
+// wQueuingStrategy,
+{
+    highWaterMark: 1024,
+    size: function (chunk) {
+        return chunk.length;
+    }
+});
 var transformStream = new TransformStream({
     transform: function (chunk, controller) {
         return __awaiter(this, void 0, void 0, function () {
@@ -116,11 +108,41 @@ var transformStream = new TransformStream({
             });
         });
     }
-}
-// rQueuingStrategy,
-// wQueuingStrategy
-);
-readableStream.pipeThrough(transformStream).pipeTo(writableStream);
+});
+var bridge = function () {
+    return __awaiter(this, void 0, void 0, function () {
+        var reader, writer, _a, value, done;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    reader = readableStream.getReader();
+                    writer = writableStream.getWriter();
+                    _b.label = 1;
+                case 1:
+                    if (!true) return [3 /*break*/, 5];
+                    return [4 /*yield*/, reader.read()];
+                case 2:
+                    _a = _b.sent(), value = _a.value, done = _a.done;
+                    logInDiv(transformDiv, value);
+                    if (!value) return [3 /*break*/, 4];
+                    console.log('writer.desiredSize', writer.desiredSize);
+                    return [4 /*yield*/, writer.ready];
+                case 3:
+                    _b.sent();
+                    writer.write(value);
+                    _b.label = 4;
+                case 4:
+                    if (done) {
+                        return [3 /*break*/, 5];
+                    }
+                    return [3 /*break*/, 1];
+                case 5: return [2 /*return*/];
+            }
+        });
+    });
+};
+// readableStream.pipeThrough(transformStream).pipeTo(writableStream)
+bridge();
 var f = function () { return __awaiter(_this, void 0, void 0, function () {
     var response, clone, reader;
     return __generator(this, function (_a) {

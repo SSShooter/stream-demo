@@ -24,10 +24,9 @@ function logInDiv(div: Element, text: string) {
 }
 
 const button = document.querySelector<HTMLButtonElement>(
-  '#readable-steam-enqueue'
+  '#readable-steam-enqueue',
 )!
 const rQueuingStrategy = new CountQueuingStrategy({ highWaterMark: 5 })
-// const rQueuingStrategy = new ByteLengthQueuingStrategy({ highWaterMark: 1024 });
 
 let index = 0
 const readableStream = new ReadableStream(
@@ -46,18 +45,10 @@ const readableStream = new ReadableStream(
       controller.enqueue(log)
     },
   },
-  rQueuingStrategy
+  rQueuingStrategy,
 )
 
-// const reader = readableStream.getReader();
-// const readButton = document.querySelector('#read');
-// readButton.onclick = async () => {
-//     const { value, done } = await reader.read();
-//     console.log('read', value, done);
-// };
-
 const wQueuingStrategy = new CountQueuingStrategy({ highWaterMark: 10 })
-// const wQueuingStrategy = new ByteLengthQueuingStrategy({ highWaterMark: 1024 });
 
 const writableStream = new WritableStream(
   {
@@ -66,7 +57,7 @@ const writableStream = new WritableStream(
       logInDiv(writableDiv!, chunk)
     },
   },
-  wQueuingStrategy
+  wQueuingStrategy,
   // {
   //   highWaterMark: 1024,
   //   size(chunk) {
@@ -75,21 +66,36 @@ const writableStream = new WritableStream(
   // }
 )
 
-// const writer = writableStream.getWriter();
-// writer.desiredSize
-
 const transformStream = new TransformStream(
   {
     async transform(chunk, controller) {
       logInDiv(transformDiv!, chunk)
       controller.enqueue(chunk)
     },
-  }
+  },
   // rQueuingStrategy,
   // wQueuingStrategy
 )
 
-readableStream.pipeThrough(transformStream).pipeTo(writableStream)
+const bridge = async function () {
+  const reader = readableStream.getReader()
+  const writer = writableStream.getWriter()
+  while (true) {
+    const { value, done } = await reader.read()
+    logInDiv(transformDiv!, value)
+    if (value) {
+      console.log('writer.desiredSize', writer.desiredSize)
+      await writer.ready
+      writer.write(value)
+    }
+    if (done) {
+      break
+    }
+  }
+}
+
+// readableStream.pipeThrough(transformStream).pipeTo(writableStream)
+bridge()
 
 const f = async () => {
   const response = await fetch('/text')
