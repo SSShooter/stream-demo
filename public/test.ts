@@ -2,17 +2,15 @@ const readableDiv = document.querySelector('#readable')
 const transformDiv = document.querySelector('#transform')
 const writableDiv = document.querySelector('#writable')
 
-// generate random characters with random length
+// Utils
 function randomChars() {
   return Array.from({ length: Math.floor(Math.random() * 20) })
     .map(() => String.fromCharCode(Math.floor(Math.random() * 26) + 97))
     .join('')
 }
-
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
-
 function wrap(text: string) {
   const p = document.createElement('p')
   p.textContent = text
@@ -22,13 +20,14 @@ function logInDiv(div: Element, text: string) {
   div.append(wrap(text))
   div.scrollTop = div.scrollHeight
 }
-
 const button = document.querySelector<HTMLButtonElement>(
   '#readable-steam-enqueue',
 )!
-const rQueuingStrategy = new CountQueuingStrategy({ highWaterMark: 15 })
 
 let index = 0
+
+// ReadableStream
+const rQueuingStrategy = new CountQueuingStrategy({ highWaterMark: 15 })
 const readableStream = new ReadableStream(
   {
     start(controller) {
@@ -50,8 +49,8 @@ const readableStream = new ReadableStream(
   rQueuingStrategy,
 )
 
+// WritableStream
 const wQueuingStrategy = new CountQueuingStrategy({ highWaterMark: 10 })
-
 const writableStream = new WritableStream(
   {
     async write(chunk) {
@@ -68,6 +67,7 @@ const writableStream = new WritableStream(
   // },
 )
 
+// TransformStream
 const transformStream = new TransformStream(
   {
     async transform(chunk, controller) {
