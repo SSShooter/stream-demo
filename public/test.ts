@@ -26,7 +26,7 @@ function logInDiv(div: Element, text: string) {
 const button = document.querySelector<HTMLButtonElement>(
   '#readable-steam-enqueue',
 )!
-const rQueuingStrategy = new CountQueuingStrategy({ highWaterMark: 5 })
+const rQueuingStrategy = new CountQueuingStrategy({ highWaterMark: 15 })
 
 let index = 0
 const readableStream = new ReadableStream(
@@ -37,12 +37,14 @@ const readableStream = new ReadableStream(
           index++ + ' start: ' + randomChars() + controller.desiredSize
         logInDiv(readableDiv!, log)
         controller.enqueue(log)
+        console.log('controller.desiredSize', controller.desiredSize)
       }
     },
     pull(controller) {
       const log = index++ + ' pull: ' + randomChars() + controller.desiredSize
       logInDiv(readableDiv!, log)
       controller.enqueue(log)
+      console.log('controller.desiredSize', controller.desiredSize)
     },
   },
   rQueuingStrategy,
@@ -63,7 +65,7 @@ const writableStream = new WritableStream(
   //   size(chunk) {
   //     return chunk.length
   //   },
-  // }
+  // },
 )
 
 const transformStream = new TransformStream(
@@ -96,10 +98,3 @@ const bridge = async function () {
 
 // readableStream.pipeThrough(transformStream).pipeTo(writableStream)
 bridge()
-
-const f = async () => {
-  const response = await fetch('/text')
-  const clone = response.clone()
-  const reader = response.body!.getReader()
-  return [clone, reader]
-}

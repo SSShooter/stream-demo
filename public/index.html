@@ -1,36 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>stream test</title>
     <style>
-        .wrapper {
-            margin-top: 20px;
-            display: flex;
-        }
-
-        #readable,
-        #transform,
-        #writable {
-            height: 80vh;
-            overflow: auto;
-            flex-basis: 30vw;
-        }
+      .wrapper {
+        margin: 20px;
+        margin-top: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      #readable,
+      #transform,
+      #writable {
+        height: 80vh;
+        overflow-x: hidden;
+        overflow-y: auto;
+        flex-basis: 28vw;
+      }
+      h2 {
+        flex-basis: 28vw;
+      }
+      ::-webkit-scrollbar {
+        width: 3px;
+      }
+      ::-webkit-scrollbar-track {
+        display: none;
+        border-radius: 10px;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 10px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #555;
+      }
     </style>
-</head>
+  </head>
 
-<body>
-    <button id="readable-steam-enqueue">enqueue</button>
-    <!-- <button id="read">read</button> -->
+  <body>
     <div class="wrapper">
-        <div id="readable"></div>
-        <div id="transform"></div>
-        <div id="writable"></div>
+      <h2>Readable</h2>
+      <h2>Intermediation</h2>
+      <h2>Writable</h2>
+      <div id="readable"></div>
+      <div id="transform"></div>
+      <div id="writable"></div>
+      <button id="readable-steam-enqueue">enqueue</button>
     </div>
-    <script src="./test.js">
-    </script>
-</body>
-
+    <script src="./test.js"></script>
+  </body>
 </html>

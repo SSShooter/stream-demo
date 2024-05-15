@@ -34,7 +34,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var _this = this;
 var readableDiv = document.querySelector('#readable');
 var transformDiv = document.querySelector('#transform');
 var writableDiv = document.querySelector('#writable');
@@ -57,8 +56,7 @@ function logInDiv(div, text) {
     div.scrollTop = div.scrollHeight;
 }
 var button = document.querySelector('#readable-steam-enqueue');
-var rQueuingStrategy = new CountQueuingStrategy({ highWaterMark: 5 });
-// const rQueuingStrategy = new ByteLengthQueuingStrategy({ highWaterMark: 1024 });
+var rQueuingStrategy = new CountQueuingStrategy({ highWaterMark: 15 });
 var index = 0;
 var readableStream = new ReadableStream({
     start: function (controller) {
@@ -66,16 +64,17 @@ var readableStream = new ReadableStream({
             var log = index++ + ' start: ' + randomChars() + controller.desiredSize;
             logInDiv(readableDiv, log);
             controller.enqueue(log);
+            console.log('controller.desiredSize', controller.desiredSize);
         };
     },
     pull: function (controller) {
         var log = index++ + ' pull: ' + randomChars() + controller.desiredSize;
         logInDiv(readableDiv, log);
         controller.enqueue(log);
+        console.log('controller.desiredSize', controller.desiredSize);
     }
 }, rQueuingStrategy);
 var wQueuingStrategy = new CountQueuingStrategy({ highWaterMark: 10 });
-// const wQueuingStrategy = new ByteLengthQueuingStrategy({ highWaterMark: 1024 });
 var writableStream = new WritableStream({
     write: function (chunk) {
         return __awaiter(this, void 0, void 0, function () {
@@ -90,14 +89,7 @@ var writableStream = new WritableStream({
             });
         });
     }
-}, 
-// wQueuingStrategy,
-{
-    highWaterMark: 1024,
-    size: function (chunk) {
-        return chunk.length;
-    }
-});
+}, wQueuingStrategy);
 var transformStream = new TransformStream({
     transform: function (chunk, controller) {
         return __awaiter(this, void 0, void 0, function () {
@@ -143,16 +135,3 @@ var bridge = function () {
 };
 // readableStream.pipeThrough(transformStream).pipeTo(writableStream)
 bridge();
-var f = function () { return __awaiter(_this, void 0, void 0, function () {
-    var response, clone, reader;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, fetch('/text')];
-            case 1:
-                response = _a.sent();
-                clone = response.clone();
-                reader = response.body.getReader();
-                return [2 /*return*/, [clone, reader]];
-        }
-    });
-}); };
