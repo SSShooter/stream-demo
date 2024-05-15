@@ -5,7 +5,6 @@ import { renderToStaticNodeStream } from 'react-dom/server'
 import { startPage, endPage } from './js/template'
 
 import App from './components/App'
-import Results from './components/Results/Results'
 import fs from 'node:fs'
 import crypto from 'node:crypto'
 import { Transform } from 'stream'

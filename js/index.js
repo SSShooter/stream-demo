@@ -38,10 +38,11 @@ class DomWriter extends WritableStream {
   constructor() {
     super({
       write(chunk) {
+        resultsContainer.append(chunk)
+        // 可以顺便对比一下每次都设置 innerHTML 会慢多少
         // resultsContainer.innerHTML += decoder.decode(decrypt, {
         //   stream: true,
         // })
-        resultsContainer.append(chunk)
       },
     })
   }
