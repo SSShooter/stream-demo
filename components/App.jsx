@@ -6,7 +6,7 @@ const App = () => (
     <div className="search">
       <h1>🕵️ ‍📖</h1>
       <div className="search-field">
-        <button id="search-button">Find</button>
+        <button id="search-button">Stream</button>
         <button id="fetch-all">Fetch All</button>
       </div>
     </div>
