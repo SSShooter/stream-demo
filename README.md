@@ -6,3 +6,4 @@ Fork from https://github.com/TejasQ/basically-streams
 - `yarn start`
 - Stream basical usage demo: `http://localhost:3000/public/`
 - Novel transmission demo: `http://localhost:3000`
+- Run `tsc` to update `public/test.js`

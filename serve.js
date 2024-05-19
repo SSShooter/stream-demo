@@ -96,6 +96,12 @@ app.get('/novel', async (req, res) => {
   file.pipe(encryptStream).pipe(res)
 })
 
+app.get('/log', async (_, res) => {
+  const file = fs.createReadStream('public/mockLogs', { highWaterMark: 1024 * 25 })
+  res.set('Content-Type', 'log')
+  file.pipe(res)
+})
+
 // index.html
 app.use('/', (req, res) => {
   // We're serving HTML.

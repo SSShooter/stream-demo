@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Show Logs</title>
+  <style>
+    body {
+      background-color: black;
+      color: white;
+      font-family: monospace;
+    }
+
+    .log-container {
+      counter-reset: line;
+      padding: 2em;
+    }
+    .log-container div {
+      margin-bottom: 6px;
+    }
+    .log-container div::before {
+      color: #ccc;
+      counter-increment: line;
+      content: counter(line);
+      display: inline-block;
+      width: 50px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="log-container"></div>
+</body>
+<script>
+  const logContainer = document.querySelector('.log-container')
+  class DomWriter extends WritableStream {
+    constructor() {
+      super({
+        write(lines) {
+          lines.forEach(line => {
+            const div = document.createElement('div')
+            div.innerHTML = line
+            logContainer.appendChild(div)
+          });
+        },
+      })
+    }
+  }
+  class LineSplitStream extends TransformStream {
+    constructor() {
+      let leftover = '';
+      super({
+        transform(chunk, controller) {
+          console.log(chunk) 
+          leftover += chunk;
+          const lines = leftover.split('\n');
+          leftover = lines.pop();
+          controller.enqueue(lines)
+        },
+        flush(controller) {
+          if (leftover) {
+            controller.enqueue([leftover]);
+          }
+        },
+      });
+    }
+  }
+  const render = async () => {
+    logContainer.innerHTML = ''
+    const response = await fetch(`/log`)
+
+    await response.body
+      .pipeThrough(new TextDecoderStream())
+      .pipeThrough(new LineSplitStream())
+      .pipeTo(new DomWriter())
+  }
+  render()
+</script>
+
+</html>
