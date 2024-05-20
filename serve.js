@@ -104,7 +104,7 @@ app.get('/log', async (_, res) => {
       setTimeout(() => {
         this.push(chunk)
         callback()
-      }, 200)
+      }, 20)
     },
   })
   file.pipe(delayer).pipe(res)

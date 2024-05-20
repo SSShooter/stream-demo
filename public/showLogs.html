@@ -29,10 +29,15 @@
   </head>
 
   <body>
+    <button id="stream">stream</button>
+    <button id="all">fetch all</button>
     <div class="log-container"></div>
   </body>
   <script>
     const logContainer = document.querySelector('.log-container')
+    const stream = document.querySelector('#stream')
+    const all = document.querySelector('#all')
+
     class DomWriter extends WritableStream {
       constructor() {
         super({
@@ -76,6 +81,22 @@
         .pipeThrough(new LineSplitStream())
         .pipeTo(new DomWriter())
     }
-    render()
+    const waitForAllThenRender = async () => {
+      logContainer.innerHTML = ''
+      const response = await fetch(`/log`)
+      const arrayBuffer = await response.arrayBuffer()
+      const text = new TextDecoder().decode(arrayBuffer)
+      const lines = text.split('\n')
+      const fragment = document.createDocumentFragment()
+      lines.forEach((line, index) => {
+        const div = document.createElement('div')
+        div.innerHTML = line
+        fragment.appendChild(div)
+      })
+      logContainer.appendChild(fragment)
+    }
+    
+    stream.addEventListener('click', render)
+    all.addEventListener('click', waitForAllThenRender)
   </script>
 </html>
