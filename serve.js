@@ -99,7 +99,15 @@ app.get('/novel', async (req, res) => {
 app.get('/log', async (_, res) => {
   const file = fs.createReadStream('public/mockLogs', { highWaterMark: 1024 * 25 })
   res.set('Content-Type', 'log')
-  file.pipe(res)
+  const delayer = new Transform({
+    transform(chunk, encoding, callback) {
+      setTimeout(() => {
+        this.push(chunk)
+        callback()
+      }, 200)
+    },
+  })
+  file.pipe(delayer).pipe(res)
 })
 
 // index.html

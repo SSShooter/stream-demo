@@ -84,8 +84,8 @@ const bridge = async function () {
   const writer = writableStream.getWriter()
   while (true) {
     const { value, done } = await reader.read()
-    logInDiv(transformDiv!, value)
     if (value) {
+      logInDiv(transformDiv!, value)
       console.log('writer.desiredSize', writer.desiredSize)
       await writer.ready
       writer.write(value)

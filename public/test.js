@@ -37,7 +37,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var readableDiv = document.querySelector('#readable');
 var transformDiv = document.querySelector('#transform');
 var writableDiv = document.querySelector('#writable');
-// generate random characters with random length
+// Utils
 function randomChars() {
     return Array.from({ length: Math.floor(Math.random() * 20) })
         .map(function () { return String.fromCharCode(Math.floor(Math.random() * 26) + 97); })
@@ -56,8 +56,9 @@ function logInDiv(div, text) {
     div.scrollTop = div.scrollHeight;
 }
 var button = document.querySelector('#readable-steam-enqueue');
-var rQueuingStrategy = new CountQueuingStrategy({ highWaterMark: 15 });
 var index = 0;
+// ReadableStream
+var rQueuingStrategy = new CountQueuingStrategy({ highWaterMark: 15 });
 var readableStream = new ReadableStream({
     start: function (controller) {
         button.onclick = function () {
@@ -74,6 +75,7 @@ var readableStream = new ReadableStream({
         console.log('controller.desiredSize', controller.desiredSize);
     }
 }, rQueuingStrategy);
+// WritableStream
 var wQueuingStrategy = new CountQueuingStrategy({ highWaterMark: 10 });
 var writableStream = new WritableStream({
     write: function (chunk) {
@@ -90,6 +92,7 @@ var writableStream = new WritableStream({
         });
     }
 }, wQueuingStrategy);
+// TransformStream
 var transformStream = new TransformStream({
     transform: function (chunk, controller) {
         return __awaiter(this, void 0, void 0, function () {
@@ -115,8 +118,8 @@ var bridge = function () {
                     return [4 /*yield*/, reader.read()];
                 case 2:
                     _a = _b.sent(), value = _a.value, done = _a.done;
-                    logInDiv(transformDiv, value);
                     if (!value) return [3 /*break*/, 4];
+                    logInDiv(transformDiv, value);
                     console.log('writer.desiredSize', writer.desiredSize);
                     return [4 /*yield*/, writer.ready];
                 case 3:
