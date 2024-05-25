@@ -3,8 +3,8 @@ const transformDiv = document.querySelector('#transform')
 const writableDiv = document.querySelector('#writable')
 
 // Utils
-function randomChars() {
-  return Array.from({ length: Math.floor(Math.random() * 20) })
+function randomChars(length = 20) {
+  return Array.from({ length: Math.floor(Math.random() * length) })
     .map(() => String.fromCharCode(Math.floor(Math.random() * 26) + 97))
     .join('')
 }
@@ -26,24 +26,24 @@ const button = document.querySelector<HTMLButtonElement>(
 
 let index = 0
 
+const emitMessage = (controller) => {
+  const log = index++ + ' msg: ' + randomChars() + controller.desiredSize
+  logInDiv(readableDiv!, log)
+  controller.enqueue(log) // 这里是进队列
+  console.log('controller.desiredSize', controller.desiredSize)
+}
+
 // ReadableStream
 const rQueuingStrategy = new CountQueuingStrategy({ highWaterMark: 15 })
 const readableStream = new ReadableStream(
   {
     start(controller) {
       button.onclick = () => {
-        const log =
-          index++ + ' start: ' + randomChars() + controller.desiredSize
-        logInDiv(readableDiv!, log)
-        controller.enqueue(log)
-        console.log('controller.desiredSize', controller.desiredSize)
+        emitMessage(controller)
       }
     },
     pull(controller) {
-      const log = index++ + ' pull: ' + randomChars() + controller.desiredSize
-      logInDiv(readableDiv!, log)
-      controller.enqueue(log)
-      console.log('controller.desiredSize', controller.desiredSize)
+      emitMessage(controller)
     },
   },
   rQueuingStrategy,
@@ -85,10 +85,10 @@ const bridge = async function () {
   while (true) {
     const { value, done } = await reader.read()
     if (value) {
-      logInDiv(transformDiv!, value)
       console.log('writer.desiredSize', writer.desiredSize)
       await writer.ready
-      writer.write(value)
+      writer.write(value) // 这里也只是写到队列里
+      logInDiv(transformDiv!, value)
     }
     if (done) {
       break

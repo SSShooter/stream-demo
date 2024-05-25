@@ -38,8 +38,9 @@ var readableDiv = document.querySelector('#readable');
 var transformDiv = document.querySelector('#transform');
 var writableDiv = document.querySelector('#writable');
 // Utils
-function randomChars() {
-    return Array.from({ length: Math.floor(Math.random() * 20) })
+function randomChars(length) {
+    if (length === void 0) { length = 20; }
+    return Array.from({ length: Math.floor(Math.random() * length) })
         .map(function () { return String.fromCharCode(Math.floor(Math.random() * 26) + 97); })
         .join('');
 }
@@ -57,22 +58,22 @@ function logInDiv(div, text) {
 }
 var button = document.querySelector('#readable-steam-enqueue');
 var index = 0;
+var emitMessage = function (controller) {
+    var log = index++ + ' msg: ' + randomChars() + controller.desiredSize;
+    logInDiv(readableDiv, log);
+    controller.enqueue(log);
+    console.log('controller.desiredSize', controller.desiredSize);
+};
 // ReadableStream
 var rQueuingStrategy = new CountQueuingStrategy({ highWaterMark: 15 });
 var readableStream = new ReadableStream({
     start: function (controller) {
         button.onclick = function () {
-            var log = index++ + ' start: ' + randomChars() + controller.desiredSize;
-            logInDiv(readableDiv, log);
-            controller.enqueue(log);
-            console.log('controller.desiredSize', controller.desiredSize);
+            emitMessage(controller);
         };
     },
     pull: function (controller) {
-        var log = index++ + ' pull: ' + randomChars() + controller.desiredSize;
-        logInDiv(readableDiv, log);
-        controller.enqueue(log);
-        console.log('controller.desiredSize', controller.desiredSize);
+        emitMessage(controller);
     }
 }, rQueuingStrategy);
 // WritableStream
@@ -119,12 +120,12 @@ var bridge = function () {
                 case 2:
                     _a = _b.sent(), value = _a.value, done = _a.done;
                     if (!value) return [3 /*break*/, 4];
-                    logInDiv(transformDiv, value);
                     console.log('writer.desiredSize', writer.desiredSize);
                     return [4 /*yield*/, writer.ready];
                 case 3:
                     _b.sent();
-                    writer.write(value);
+                    writer.write(value); // 注意这个写只是写到队列里
+                    logInDiv(transformDiv, value);
                     _b.label = 4;
                 case 4:
                     if (done) {
