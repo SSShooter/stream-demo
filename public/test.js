@@ -61,7 +61,7 @@ var index = 0;
 var emitMessage = function (controller) {
     var log = index++ + ' msg: ' + randomChars() + controller.desiredSize;
     logInDiv(readableDiv, log);
-    controller.enqueue(log); // 这里是进队列
+    controller.enqueue(log); // 这里只是进可读流队列
     console.log('controller.desiredSize', controller.desiredSize);
 };
 // ReadableStream
@@ -122,10 +122,13 @@ var bridge = function () {
                     , value = _a.value, done = _a.done;
                     if (!value) return [3 /*break*/, 4];
                     console.log('writer.desiredSize', writer.desiredSize);
-                    return [4 /*yield*/, writer.ready];
+                    return [4 /*yield*/, writer.ready
+                        // 因为可写队列为 10，所以会有 10 条流到这里
+                    ];
                 case 3:
                     _b.sent();
-                    writer.write(value); // 这里也只是写到队列里
+                    // 因为可写队列为 10，所以会有 10 条流到这里
+                    writer.write(value); // 写入到 可写流队列
                     logInDiv(transformDiv, value);
                     _b.label = 4;
                 case 4:
@@ -139,4 +142,4 @@ var bridge = function () {
     });
 };
 // readableStream.pipeThrough(transformStream).pipeTo(writableStream)
-// bridge()
+bridge();

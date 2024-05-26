@@ -29,7 +29,7 @@ let index = 0
 const emitMessage = (controller) => {
   const log = index++ + ' msg: ' + randomChars() + controller.desiredSize
   logInDiv(readableDiv!, log)
-  controller.enqueue(log) // 这里是进队列
+  controller.enqueue(log) // 这里只是进可读流队列
   console.log('controller.desiredSize', controller.desiredSize)
 }
 
@@ -99,4 +99,4 @@ const bridge = async function () {
 }
 
 // readableStream.pipeThrough(transformStream).pipeTo(writableStream)
-// bridge()
+bridge()
