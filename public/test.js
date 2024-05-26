@@ -13,7 +13,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     function verb(n) { return function (v) { return step([n, v]); }; }
     function step(op) {
         if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
+        while (g && (g = 0, op[0] && (_ = 0)), _) try {
             if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
             if (y = 0, t) op = [op[0] & 2, t.value];
             switch (op[0]) {
@@ -61,7 +61,7 @@ var index = 0;
 var emitMessage = function (controller) {
     var log = index++ + ' msg: ' + randomChars() + controller.desiredSize;
     logInDiv(readableDiv, log);
-    controller.enqueue(log);
+    controller.enqueue(log); // 这里是进队列
     console.log('controller.desiredSize', controller.desiredSize);
 };
 // ReadableStream
@@ -74,7 +74,7 @@ var readableStream = new ReadableStream({
     },
     pull: function (controller) {
         emitMessage(controller);
-    }
+    },
 }, rQueuingStrategy);
 // WritableStream
 var wQueuingStrategy = new CountQueuingStrategy({ highWaterMark: 10 });
@@ -91,9 +91,9 @@ var writableStream = new WritableStream({
                 }
             });
         });
-    }
+    },
 }, wQueuingStrategy);
-// TransformStream
+// TransformStream（未使用）
 var transformStream = new TransformStream({
     transform: function (chunk, controller) {
         return __awaiter(this, void 0, void 0, function () {
@@ -103,7 +103,7 @@ var transformStream = new TransformStream({
                 return [2 /*return*/];
             });
         });
-    }
+    },
 });
 var bridge = function () {
     return __awaiter(this, void 0, void 0, function () {
@@ -116,15 +116,16 @@ var bridge = function () {
                     _b.label = 1;
                 case 1:
                     if (!true) return [3 /*break*/, 5];
-                    return [4 /*yield*/, reader.read()];
+                    return [4 /*yield*/, reader.read()]; // 从队列读出来
                 case 2:
-                    _a = _b.sent(), value = _a.value, done = _a.done;
+                    _a = _b.sent() // 从队列读出来
+                    , value = _a.value, done = _a.done;
                     if (!value) return [3 /*break*/, 4];
                     console.log('writer.desiredSize', writer.desiredSize);
                     return [4 /*yield*/, writer.ready];
                 case 3:
                     _b.sent();
-                    writer.write(value); // 注意这个写只是写到队列里
+                    writer.write(value); // 这里也只是写到队列里
                     logInDiv(transformDiv, value);
                     _b.label = 4;
                 case 4:
@@ -138,4 +139,4 @@ var bridge = function () {
     });
 };
 // readableStream.pipeThrough(transformStream).pipeTo(writableStream)
-bridge();
+// bridge()

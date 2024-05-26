@@ -67,7 +67,7 @@ const writableStream = new WritableStream(
   // },
 )
 
-// TransformStream
+// TransformStream（未使用）
 const transformStream = new TransformStream(
   {
     async transform(chunk, controller) {
@@ -83,11 +83,13 @@ const bridge = async function () {
   const reader = readableStream.getReader()
   const writer = writableStream.getWriter()
   while (true) {
-    const { value, done } = await reader.read()
+    // 因为可读队列为 15，所以直接 pull 出 15 条
+    const { value, done } = await reader.read() // 从队列读出来
     if (value) {
       console.log('writer.desiredSize', writer.desiredSize)
       await writer.ready
-      writer.write(value) // 这里也只是写到队列里
+      // 因为可写队列为 10，所以会有 10 条流到这里
+      writer.write(value) // 写入到 可写流队列
       logInDiv(transformDiv!, value)
     }
     if (done) {
@@ -97,4 +99,4 @@ const bridge = async function () {
 }
 
 // readableStream.pipeThrough(transformStream).pipeTo(writableStream)
-bridge()
+// bridge()
