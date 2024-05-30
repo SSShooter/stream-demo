@@ -26,10 +26,10 @@ const button = document.querySelector<HTMLButtonElement>(
 
 let index = 0
 
-const emitMessage = (controller) => {
+const emitMessage = (controller: ReadableStreamDefaultController<string>) => {
   const log = index++ + ' msg: ' + randomChars() + controller.desiredSize
-  logInDiv(readableDiv!, log)
   controller.enqueue(log) // 这里只是进可读流队列
+  logInDiv(readableDiv!, log) // 显示在第一列
   console.log('controller.desiredSize', controller.desiredSize)
 }
 
@@ -55,7 +55,7 @@ const writableStream = new WritableStream(
   {
     async write(chunk) {
       await sleep(5000)
-      logInDiv(writableDiv!, chunk)
+      logInDiv(writableDiv!, chunk) // 显示在第三列
     },
   },
   wQueuingStrategy,
@@ -90,7 +90,7 @@ const bridge = async function () {
       await writer.ready
       // 因为可写队列为 10，所以会有 10 条流到这里
       writer.write(value) // 写入到 可写流队列
-      logInDiv(transformDiv!, value)
+      logInDiv(transformDiv!, value) // 显示在第二列
     }
     if (done) {
       break

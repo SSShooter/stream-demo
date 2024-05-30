@@ -53,9 +53,7 @@ app.get('/fake-stream', async (req, res) => {
 const algorithm = 'aes-192-cbc'
 const password = 'Password used to generate key'
 app.get('/novel-1', async (req, res) => {
-  // get file
   const file = fs.createReadStream('novel.txt')
-  // set header
   res.set('Content-Type', 'message')
   crypto.scrypt(password, 'salt', 24, (err, key) => {
     if (err) throw err
@@ -75,15 +73,14 @@ app.get('/novel-1', async (req, res) => {
   })
 })
 
-app.get('/novel', async (req, res) => {
-  // get file
+app.get('/novel', async (_, res) => {
   const file = fs.createReadStream('les-miserable.txt', { highWaterMark: 1024 * 25 })
-  // set header
   res.set('Content-Type', 'message')
   const encryptStream = new Transform({
     transform(chunk, encoding, callback) {
       setTimeout(() => {
         const encrypted = []
+        // 加密字节流
         chunk.forEach((byte) => {
           encrypted.push(map[byte])
         })

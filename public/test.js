@@ -13,7 +13,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     function verb(n) { return function (v) { return step([n, v]); }; }
     function step(op) {
         if (f) throw new TypeError("Generator is already executing.");
-        while (g && (g = 0, op[0] && (_ = 0)), _) try {
+        while (_) try {
             if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
             if (y = 0, t) op = [op[0] & 2, t.value];
             switch (op[0]) {
@@ -60,8 +60,8 @@ var button = document.querySelector('#readable-steam-enqueue');
 var index = 0;
 var emitMessage = function (controller) {
     var log = index++ + ' msg: ' + randomChars() + controller.desiredSize;
-    logInDiv(readableDiv, log);
     controller.enqueue(log); // 这里只是进可读流队列
+    logInDiv(readableDiv, log); // 显示在第一列
     console.log('controller.desiredSize', controller.desiredSize);
 };
 // ReadableStream
@@ -74,7 +74,7 @@ var readableStream = new ReadableStream({
     },
     pull: function (controller) {
         emitMessage(controller);
-    },
+    }
 }, rQueuingStrategy);
 // WritableStream
 var wQueuingStrategy = new CountQueuingStrategy({ highWaterMark: 10 });
@@ -86,12 +86,12 @@ var writableStream = new WritableStream({
                     case 0: return [4 /*yield*/, sleep(5000)];
                     case 1:
                         _a.sent();
-                        logInDiv(writableDiv, chunk);
+                        logInDiv(writableDiv, chunk); // 显示在第三列
                         return [2 /*return*/];
                 }
             });
         });
-    },
+    }
 }, wQueuingStrategy);
 // TransformStream（未使用）
 var transformStream = new TransformStream({
@@ -103,7 +103,7 @@ var transformStream = new TransformStream({
                 return [2 /*return*/];
             });
         });
-    },
+    }
 });
 var bridge = function () {
     return __awaiter(this, void 0, void 0, function () {
@@ -129,7 +129,7 @@ var bridge = function () {
                     _b.sent();
                     // 因为可写队列为 10，所以会有 10 条流到这里
                     writer.write(value); // 写入到 可写流队列
-                    logInDiv(transformDiv, value);
+                    logInDiv(transformDiv, value); // 显示在第二列
                     _b.label = 4;
                 case 4:
                     if (done) {

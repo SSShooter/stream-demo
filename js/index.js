@@ -49,6 +49,7 @@ class DomWriter extends WritableStream {
 }
 
 let ac = null
+// 获取小说流
 const getNovelStream = async () => {
   if (ac) {
     ac.abort('refetch')
@@ -74,6 +75,7 @@ const getNovelStream = async () => {
   ac = null
 }
 
+// 未分层的流实现
 const getNovelStreamOld = () => {
   resultsContainer.innerHTML = ''
   const start = performance.now()
@@ -101,6 +103,7 @@ const getNovelStreamOld = () => {
   })
 }
 
+// 获取全部后处理
 const getNovel = async () => {
   if (ac) {
     ac.abort('fetch all')
