@@ -8,7 +8,7 @@ function randomChars(length = 20) {
     .map(() => String.fromCharCode(Math.floor(Math.random() * 26) + 97))
     .join('')
 }
-function sleep(ms) {
+function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 function wrap(text: string) {
@@ -35,7 +35,7 @@ const emitMessage = (controller: ReadableStreamDefaultController<string>) => {
 
 // ReadableStream
 const rQueuingStrategy = new CountQueuingStrategy({ highWaterMark: 15 })
-const readableStream = new ReadableStream(
+const readableStream = new ReadableStream<string>(
   {
     start(controller) {
       button.onclick = () => {
@@ -51,7 +51,7 @@ const readableStream = new ReadableStream(
 
 // WritableStream
 const wQueuingStrategy = new CountQueuingStrategy({ highWaterMark: 10 })
-const writableStream = new WritableStream(
+const writableStream = new WritableStream<string>(
   {
     async write(chunk) {
       await sleep(5000)
@@ -68,7 +68,7 @@ const writableStream = new WritableStream(
 )
 
 // TransformStream（未使用）
-const transformStream = new TransformStream(
+const transformStream = new TransformStream<string, string>(
   {
     async transform(chunk, controller) {
       logInDiv(transformDiv!, chunk)

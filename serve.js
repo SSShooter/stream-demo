@@ -80,7 +80,7 @@ app.get('/novel', async (_, res) => {
     transform(chunk, encoding, callback) {
       setTimeout(() => {
         const encrypted = []
-        // 加密字节流
+        // 加密字节流，传到浏览器是乱码
         chunk.forEach((byte) => {
           encrypted.push(map[byte])
         })

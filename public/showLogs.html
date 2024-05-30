@@ -55,8 +55,11 @@
     }
     class LineSplitStream extends TransformStream {
       constructor() {
-        let leftover = ''
+        let leftover = undefined
         super({
+          start(controller) {
+            leftover = ''
+          },
           transform(chunk, controller) {
             console.log(chunk)
             leftover += chunk
